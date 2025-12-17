@@ -132,6 +132,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn main:app --reload
+```
 
 ### Frontend
 
@@ -140,9 +141,8 @@ cd frontend
 npm install
 npm run dev
 
+```
 ## Mermaid Diagrams
-
-> These diagrams render automatically on GitHub in Markdown files.
 
 ### System Workflow (End-to-End)
 
