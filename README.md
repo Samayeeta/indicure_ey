@@ -132,3 +132,36 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn main:app --reload
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+
+## Mermaid Diagrams
+
+> These diagrams render automatically on GitHub in Markdown files.
+
+### System Workflow (End-to-End)
+
+```mermaid
+flowchart TD
+    A[Web Application Interface (Frontend)\nUser Query: "Find repurposing potential for Ranolazine"] --> B[Master Orchestration Agent\nInterpret query → Break into subtasks → Dispatch]
+    B --> C1[Clinical Trials Agent\nCTRI/NIH/PubMed evidence]
+    B --> C2[Patent Landscape Agent\nActive/expired patents + FTO]
+    B --> C3[IQVIA Insights Agent\nMarket size + CAGR + trends]
+    B --> C4[Web Intelligence Agent\nWHO/AHA/JAPI + literature]
+    B --> C5[Internal Knowledge Agent\nInternal strategy notes]
+    B --> C6[EXIM Trends Agent\nImport/export patterns (optional)]
+
+    C1 --> D[Aggregation Phase (Master)\nValidate → De-duplicate → Synthesize]
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    C5 --> D
+    C6 --> D
+
+    D --> E[Report Generator Agent\nReportLab PDF + Tables + Figures + References]
+    E --> F[PDF Report Output\nDownload via UI]
