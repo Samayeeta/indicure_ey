@@ -167,66 +167,46 @@ npm install
 npm run dev
 
 ```
+### Running the Full System
+
+1. Start the **backend** (FastAPI).
+2. Start the **frontend** (Vite development server).
+3. Open the frontend UI in your browser.
+4. Run a query (e.g., *Ranolazine → HFpEF*).
+5. Download the generated **PDF report** from the dashboard.
+
 ## Roadmap / Future Work
 
-### 1) Agent Execution: Real Data + Reliability
-- Replace demo/static agent outputs with real ingestion pipelines (PubMed, CTRI, NIH, patent sources, market sources).
-- Add retry logic, timeouts, and circuit breakers per agent to avoid all-or-nothing failures.
-- Introduce agent-level caching keyed by `(drug, indication, geo, mode)` to speed up repeated queries.
-- Add structured logging and trace IDs for end-to-end debugging of agent execution.
+- **Agent Reliability**
+  - Replace demo outputs with real data pipelines (PubMed, CTRI, NIH, patents, market data).
+  - Add retries, timeouts, caching, and structured logging per agent.
 
-### 2) Evidence Quality & Scoring
-- Introduce an evidence grading rubric based on trial phase, sample size, endpoint relevance, and statistical strength.
-- Add confidence scoring per section:
-  - Mechanism
-  - Clinical
-  - Safety
-  - Patent/FTO
-  - Market
-- Define conflict-resolution rules (e.g., if clinical signal is positive but safety concerns exist, elevate warnings and downgrade confidence).
+- **Evidence Quality & Scoring**
+  - Introduce evidence grading and confidence scores (Clinical, Safety, Patent/FTO, Market).
+  - Define rules to handle conflicting signals across agents.
 
-### 3) More Comprehensive Reports (PDF)
-- Expand report sections:
-  - Mechanistic rationale (targets and pathways)
-  - Safety and contraindication flags
-  - Trial landscape summary (phase distribution, endpoints)
-  - India-specific unmet need and accessibility assumptions
-  - Competitive landscape and standard-of-care comparison
-- Add richer figures:
-  - Evidence strength radar chart
-  - Trial timeline chart
-  - Signal vs risk quadrant plot
-  - Market TAM/SAM/SOM bar charts
-- Enable fully hyperlinked references (PubMed, DOI, WHO pages) with consistent citation formatting.
+- **Richer PDF Reports**
+  - Expand sections (mechanism, safety, trials, India unmet need, competition).
+  - Add advanced figures (evidence radar, trial timelines, risk vs signal plots).
+  - Enable fully hyperlinked, consistently formatted references.
 
-### 4) Frontend Enhancements
-- Add per-agent progress indicators and partial results via streaming updates so the UI does not block on the slowest agent.
-- Add a report preview panel before PDF download.
-- Add query history and saved reports (local storage and server-side).
-- Support multiple export formats: PDF, JSON, and CSV.
+- **Frontend Enhancements**
+  - Show per-agent progress and partial results.
+  - Add report preview, query history, saved reports, and multi-format exports (PDF/JSON/CSV).
 
-### 5) Data Layer + Storage
-- Introduce a database for:
-  - Query history
-  - Cached agent outputs
-  - Generated report metadata
-- Optional: object storage for PDFs (local during development, cloud-backed later).
+- **Data & Storage**
+  - Add database for query history, cached outputs, and report metadata.
+  - Optional object storage for generated PDFs.
 
-### 6) Security & Operational Readiness
-- Add API authentication (API keys or JWT) for protected endpoints.
-- Apply rate limiting on expensive routes such as `/api/report/pdf`.
-- Sanitize external content (HTML stripping, length limits) before inserting into PDFs.
-- Add CI pipelines (linting, tests) and pre-commit hooks.
+- **Security & Ops**
+  - API authentication, rate limiting, content sanitization.
+  - CI pipelines, linting, tests, and pre-commit hooks.
 
-### 7) Extensibility: New Drugs, Indications, Regions
-- Implement config-driven agent routing where geography enables or disables specific data sources.
-- Create a pluggable agent framework where new agents follow a standard interface and registration pattern.
-- Support multiple report templates (clinical-heavy, patent-heavy, market-heavy) selectable via mode.
+- **Extensibility**
+  - Config-driven agent routing by geography and mode.
+  - Pluggable agent framework and multiple report templates.
 
-### 8) Validation & Evaluation
-- Build a benchmark dataset of known drug repurposing case studies.
-- Add automated evaluation metrics:
-  - Citation coverage
-  - Hallucination checks (source-backed claims only)
-  - Cross-section consistency checks
-- Introduce a human review workflow with approve or request-changes states per report.
+- **Validation**
+  - Benchmark against known repurposing case studies.
+  - Automated checks for citation coverage, hallucinations, and consistency.
+  - Human review workflow for report approval.
