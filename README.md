@@ -121,6 +121,31 @@ The platform combines modular AI agents with a web-based dashboard to support ex
   - Matplotlib (non-interactive backend) for figures
 
 ---
+## Mermaid Diagrams
+
+### System Workflow (End-to-End)
+
+```mermaid
+flowchart TD
+  A[Frontend UI<br/>User query: Find repurposing potential for Ranolazine] --> B[Master orchestration agent<br/>Interpret query and dispatch tasks]
+
+  B --> C1[Clinical trials agent<br/>CTRI NIH PubMed evidence]
+  B --> C2[Patent landscape agent<br/>Active expired patents and FTO]
+  B --> C3[IQVIA insights agent<br/>Market size CAGR and trends]
+  B --> C4[Web intelligence agent<br/>WHO AHA JAPI and literature]
+  B --> C5[Internal knowledge agent<br/>Internal strategy notes]
+  B --> C6[EXIM trends agent<br/>Import export patterns optional]
+
+  C1 --> D[Aggregation phase<br/>Validate deduplicate synthesize]
+  C2 --> D
+  C3 --> D
+  C4 --> D
+  C5 --> D
+  C6 --> D
+
+  D --> E[Report generator agent<br/>ReportLab PDF with tables figures references]
+  E --> F[PDF report output<br/>Download via UI]
+```
 
 ## Setup Instructions
 
@@ -142,26 +167,66 @@ npm install
 npm run dev
 
 ```
-## Mermaid Diagrams
+## Roadmap / Future Work
 
-### System Workflow (End-to-End)
+### 1) Agent Execution: Real Data + Reliability
+- Replace demo/static agent outputs with real ingestion pipelines (PubMed, CTRI, NIH, patent sources, market sources).
+- Add retry logic, timeouts, and circuit breakers per agent to avoid all-or-nothing failures.
+- Introduce agent-level caching keyed by `(drug, indication, geo, mode)` to speed up repeated queries.
+- Add structured logging and trace IDs for end-to-end debugging of agent execution.
 
-```mermaid
-flowchart TD
-    A[Web Application Interface (Frontend)\nUser Query: "Find repurposing potential for Ranolazine"] --> B[Master Orchestration Agent\nInterpret query → Break into subtasks → Dispatch]
-    B --> C1[Clinical Trials Agent\nCTRI/NIH/PubMed evidence]
-    B --> C2[Patent Landscape Agent\nActive/expired patents + FTO]
-    B --> C3[IQVIA Insights Agent\nMarket size + CAGR + trends]
-    B --> C4[Web Intelligence Agent\nWHO/AHA/JAPI + literature]
-    B --> C5[Internal Knowledge Agent\nInternal strategy notes]
-    B --> C6[EXIM Trends Agent\nImport/export patterns (optional)]
+### 2) Evidence Quality & Scoring
+- Introduce an evidence grading rubric based on trial phase, sample size, endpoint relevance, and statistical strength.
+- Add confidence scoring per section:
+  - Mechanism
+  - Clinical
+  - Safety
+  - Patent/FTO
+  - Market
+- Define conflict-resolution rules (e.g., if clinical signal is positive but safety concerns exist, elevate warnings and downgrade confidence).
 
-    C1 --> D[Aggregation Phase (Master)\nValidate → De-duplicate → Synthesize]
-    C2 --> D
-    C3 --> D
-    C4 --> D
-    C5 --> D
-    C6 --> D
+### 3) More Comprehensive Reports (PDF)
+- Expand report sections:
+  - Mechanistic rationale (targets and pathways)
+  - Safety and contraindication flags
+  - Trial landscape summary (phase distribution, endpoints)
+  - India-specific unmet need and accessibility assumptions
+  - Competitive landscape and standard-of-care comparison
+- Add richer figures:
+  - Evidence strength radar chart
+  - Trial timeline chart
+  - Signal vs risk quadrant plot
+  - Market TAM/SAM/SOM bar charts
+- Enable fully hyperlinked references (PubMed, DOI, WHO pages) with consistent citation formatting.
 
-    D --> E[Report Generator Agent\nReportLab PDF + Tables + Figures + References]
-    E --> F[PDF Report Output\nDownload via UI]
+### 4) Frontend Enhancements
+- Add per-agent progress indicators and partial results via streaming updates so the UI does not block on the slowest agent.
+- Add a report preview panel before PDF download.
+- Add query history and saved reports (local storage and server-side).
+- Support multiple export formats: PDF, JSON, and CSV.
+
+### 5) Data Layer + Storage
+- Introduce a database for:
+  - Query history
+  - Cached agent outputs
+  - Generated report metadata
+- Optional: object storage for PDFs (local during development, cloud-backed later).
+
+### 6) Security & Operational Readiness
+- Add API authentication (API keys or JWT) for protected endpoints.
+- Apply rate limiting on expensive routes such as `/api/report/pdf`.
+- Sanitize external content (HTML stripping, length limits) before inserting into PDFs.
+- Add CI pipelines (linting, tests) and pre-commit hooks.
+
+### 7) Extensibility: New Drugs, Indications, Regions
+- Implement config-driven agent routing where geography enables or disables specific data sources.
+- Create a pluggable agent framework where new agents follow a standard interface and registration pattern.
+- Support multiple report templates (clinical-heavy, patent-heavy, market-heavy) selectable via mode.
+
+### 8) Validation & Evaluation
+- Build a benchmark dataset of known drug repurposing case studies.
+- Add automated evaluation metrics:
+  - Citation coverage
+  - Hallucination checks (source-backed claims only)
+  - Cross-section consistency checks
+- Introduce a human review workflow with approve or request-changes states per report.
