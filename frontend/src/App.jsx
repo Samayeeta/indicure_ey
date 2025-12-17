@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+
 function Dropdown({ value, onChange, options, placeholder = "Select…" }) {
   const [open, setOpen] = useState(false);
-  const [dir, setDir] = useState("down"); 
+  const [dir, setDir] = useState("down");
   const rootRef = useRef(null);
   const btnRef = useRef(null);
 
@@ -27,7 +29,7 @@ function Dropdown({ value, onChange, options, placeholder = "Select…" }) {
     if (!open || !btnRef.current) return;
 
     const rect = btnRef.current.getBoundingClientRect();
-    const menuMax = 240; 
+    const menuMax = 240;
     const spaceBelow = window.innerHeight - rect.bottom;
     const spaceAbove = rect.top;
 
@@ -72,14 +74,23 @@ function Dropdown({ value, onChange, options, placeholder = "Select…" }) {
   );
 }
 
-export default function App() {
-  const [view, setView] = useState("input"); 
-  const [activeTab, setActiveTab] = useState("summary");
+function AgentRow({ name, status }) {
+  return (
+    <li className="agent-row">
+      <span>{name}</span>
+      {status === "pending" && <span className="tag pending">Queued</span>}
+      {status === "running" && <span className="tag running">Running</span>}
+      {status === "done" && <span className="tag done">Completed</span>}
+    </li>
+  );
+}
 
+export default function App() {
+  const [view, setView] = useState("input");
+  const [activeTab, setActiveTab] = useState("summary");
 
   const [analysisMode, setAnalysisMode] = useState("General");
   const [geography, setGeography] = useState("India");
-
 
   const [agentStatus, setAgentStatus] = useState({
     orchestration: "pending",
@@ -93,20 +104,14 @@ export default function App() {
   const modeOptions = useMemo(() => ["General", "Clinical", "Patent", "Market"], []);
   const geoOptions = useMemo(() => ["India"], []);
 
+  const pdfUrl = useMemo(() => {
+    const qs = new URLSearchParams({ mode: analysisMode, geo: geography });
+    return `${API_BASE}/api/report/pdf?${qs.toString()}`;
+  }, [analysisMode, geography]);
+
   const downloadPdf = async () => {
     try {
-      const qs = new URLSearchParams({
-        mode: analysisMode, 
-        geo: geography, 
-      });
-
-
-      const res = await fetch(
-  `http://127.0.0.1:8000/api/report/pdf?${qs.toString()}`,
-  {
-    method: "GET",
-  }
-);
+      const res = await fetch(pdfUrl, { method: "GET" });
 
       if (!res.ok) {
         const txt = await res.text();
@@ -114,20 +119,17 @@ export default function App() {
       }
 
       const blob = await res.blob();
-
       if (!blob || blob.size < 500) {
         throw new Error("PDF response looks empty or too small.");
       }
 
       const url = window.URL.createObjectURL(blob);
-
       const a = document.createElement("a");
       a.href = url;
       a.download = `IndiCure_Ranolazine_HFpEF_${geography}_${analysisMode}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
-
       window.URL.revokeObjectURL(url);
     } catch (e) {
       console.error(e);
@@ -172,7 +174,6 @@ export default function App() {
         </p>
       </header>
 
-      {/* QUERY INPUT */}
       {view === "input" && (
         <section className="card input-card">
           <h2>Molecule-level Query</h2>
@@ -201,7 +202,6 @@ export default function App() {
         </section>
       )}
 
-      {/* PROCESSING */}
       {view === "processing" && (
         <section className="card processing-card">
           <h2>Agent Execution</h2>
@@ -219,13 +219,11 @@ export default function App() {
         </section>
       )}
 
-      {/* RESULTS */}
       {view === "results" && (
         <section className="results">
           <div className="results-header">
             <h2>Results Dashboard</h2>
             <div className="results-actions">
-              {/* ✅ Use the reusable downloader */}
               <button className="secondary" onClick={downloadPdf}>
                 Download PDF
               </button>
@@ -321,16 +319,5 @@ export default function App() {
         </section>
       )}
     </div>
-  );
-}
-
-function AgentRow({ name, status }) {
-  return (
-    <li className="agent-row">
-      <span>{name}</span>
-      {status === "pending" && <span className="tag pending">Queued</span>}
-      {status === "running" && <span className="tag running">Running</span>}
-      {status === "done" && <span className="tag done">Completed</span>}
-    </li>
   );
 }
