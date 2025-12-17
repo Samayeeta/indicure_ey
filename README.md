@@ -179,34 +179,27 @@ npm run dev
 
 - **Agent Reliability**
   - Replace demo outputs with real data pipelines (PubMed, CTRI, NIH, patents, market data).
-  - Add retries, timeouts, caching, and structured logging per agent.
+  - Add retries, caching, and structured logging per agent.
 
-- **Evidence Quality & Scoring**
-  - Introduce evidence grading and confidence scores (Clinical, Safety, Patent/FTO, Market).
-  - Define rules to handle conflicting signals across agents.
+- **Evidence Quality**
+  - Introduce evidence grading and confidence scores across Clinical, Safety, Patent/FTO, and Market signals.
+  - Handle conflicting evidence via defined resolution rules.
 
-- **Richer PDF Reports**
+- **Enhanced PDF Reports**
   - Expand sections (mechanism, safety, trials, India unmet need, competition).
-  - Add advanced figures (evidence radar, trial timelines, risk vs signal plots).
-  - Enable fully hyperlinked, consistently formatted references.
+  - Add richer figures (evidence radar, timelines, risk vs signal).
+  - Enable fully hyperlinked references.
 
-- **Frontend Enhancements**
-  - Show per-agent progress and partial results.
-  - Add report preview, query history, saved reports, and multi-format exports (PDF/JSON/CSV).
+- **Frontend Improvements**
+  - Per-agent progress updates and partial results.
+  - Report preview, query history, and multi-format exports (PDF/JSON/CSV).
 
-- **Data & Storage**
-  - Add database for query history, cached outputs, and report metadata.
-  - Optional object storage for generated PDFs.
+- **Data, Security & Extensibility**
+  - Database-backed caching and report metadata.
+  - API authentication, rate limiting, and CI checks.
+  - Pluggable agents, geography-based routing, and multiple report templates.
 
-- **Security & Ops**
-  - API authentication, rate limiting, content sanitization.
-  - CI pipelines, linting, tests, and pre-commit hooks.
+---
 
-- **Extensibility**
-  - Config-driven agent routing by geography and mode.
-  - Pluggable agent framework and multiple report templates.
-
-- **Validation**
-  - Benchmark against known repurposing case studies.
-  - Automated checks for citation coverage, hallucinations, and consistency.
-  - Human review workflow for report approval.
+**Note:**  
+This system is a **project prototype developed for EY Techathon – Stage 2** and is intended to demonstrate architecture, agent orchestration, and reporting workflows rather than serve as a production-ready platform.
