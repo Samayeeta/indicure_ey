@@ -1,20 +1,25 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
-
+from agents.report_pdf import build_pdf
 from models import AnalyzeRequest, AnalyzeResponse, AgentTraceItem
 from agents.master import run_orchestration
 from agents.report_pdf import build_pdf
-
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(title="IndiCure AI Prototype API", version="1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-    allow_credentials=True,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://YOUR-FRONTEND-NAME.onrender.com",
+    ],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/health")
 def health():
@@ -59,7 +64,7 @@ def export_pdf(req: AnalyzeRequest):
     if getattr(req, "analysis_mode", None):
         report["analysis_mode"] = req.analysis_mode
 
-    pdf_bytes = generate_report_pdf(report)
+    pdf_bytes = build_pdf(report)
 
     return Response(
         content=pdf_bytes,
@@ -85,3 +90,4 @@ def report_pdf(mode: str = "General", geo: str = "India"):
             "Content-Disposition": f'attachment; filename="IndiCure_Ranolazine_HFpEF_{geo}_{mode}.pdf"'
         },
     )
+
